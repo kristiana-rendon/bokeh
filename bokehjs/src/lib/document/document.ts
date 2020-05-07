@@ -471,11 +471,15 @@ export class Document {
         instance.setv(attrs, {silent: true})
     })
 
+    const instances: HasProps[] = []
     // after removing all the refs, we can run the initialize code safely
     foreach_depth_first(to_update, function(instance, _attrs, was_new) {
-      if (was_new)
+      if (was_new) {
+        instances.push(instance)
         instance.finalize()
+      }
     })
+    instances.forEach(i => {i.connect_signals()})
   }
 
   static _event_for_attribute_change(changed_obj: Struct, key: string, new_value: any, doc: Document, value_refs: {[key: string]: HasProps}): ModelChanged | null {
